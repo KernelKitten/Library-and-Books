@@ -4,6 +4,10 @@
 #include <limits>
 #include <algorithm>
 #include <string>
+extern "C" // To include SQLite C library
+{
+	#include "sqlite3.h"
+}
 
 using namespace std;
 
@@ -33,7 +37,7 @@ class Library
 			for (Book& book : books)
 			{
 				book.display();
-				cout << "---------------------\n";
+				cout << "------------------------------------\n";
 			}
 		}
 
@@ -130,6 +134,7 @@ istream& operator>>(istream& in, Book& book)
 	book.isAvailable = "Yes";
 	return in;
 }
+
 ostream& operator<<(ostream& out, Book book)
 {
 	out << "Title: " << book.title << "\n";
@@ -142,21 +147,21 @@ ostream& operator<<(ostream& out, Book book)
 
 #pragma endregion
 
-int main()
+void printMenu()
 {
-	freopen("books.txt", "r", stdin);
+	cout << "Library Menu:\n";
+	cout << "1. Add Book\n";
+	cout << "2. Remove Book\n";
+	cout << "3. Find Book\n";
+	cout << "4. Borrow Book\n";
+	cout << "5. Return Book\n";
+	cout << "6. Display All Books\n";
+	cout << "7. Exit\n";
+	cout << "Choose an option: ";
+}
 
-	Book book;
-	Library library;
-
-	while (cin >> book)
-	{
-		library.addBook(book);
-	}
-
-	cin.clear();
-	freopen("CON", "r", stdin);
-
+void inputchoice(Library library)
+{
 	while (true)
 	{
 		cout << "\nLibrary Menu:\n";
@@ -171,7 +176,7 @@ int main()
 		int choice;
 		cin >> choice;
 		cin.ignore(numeric_limits < streamsize>::max(), '\n');
-		
+
 		if (choice == 1)
 		{
 			Book newBook;
@@ -221,6 +226,32 @@ int main()
 			cout << "\nInvalid choice. Please try again.\n";
 		}
 	}
+
+}
+
+int main()
+{
+	sqlite3* db;
+
+	/*if (sqlite3_open("test.db", &db)) {
+		std::cerr << "Ошибка открытия: " << sqlite3_errmsg(db) << std::endl;
+		return 1;
+	}*/
+
+	//freopen("books.txt", "r", stdin);
+
+	Book book;
+	Library library;
+
+	while (cin >> book)
+	{
+		library.addBook(book);
+	}
+
+	cin.clear();
+	freopen("CON", "r", stdin);
+
+	inputchoice(library);
 
 	return 0;
 }
